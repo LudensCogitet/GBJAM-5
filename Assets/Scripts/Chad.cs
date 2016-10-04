@@ -5,6 +5,8 @@ public class Chad : MonoBehaviour {
 
     public class pState
     {
+        public int logsTouching = 0;
+
         public bool initialLoop = true;
 
         public bool falling = false;
@@ -16,10 +18,11 @@ public class Chad : MonoBehaviour {
         public bool canClimbDown = false;
         public bool stopClimbingDown = false;
 
+        public bool canMoveLeft = true;
+        public bool canMoveRight = true;
 
         public bool climbing = false;
         
-
         public bool ridingElevator = false;
     }
 
@@ -44,12 +47,13 @@ public class Chad : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
+        Debug.Log(myState.logsTouching);
         if (myState.falling == false)
         {
             if (myState.climbing == false)
             {
-                if (Input.GetKey(KeyCode.LeftArrow)) { transform.position += Vector3.left * walkSpeed; }
-                if (Input.GetKey(KeyCode.RightArrow)) { transform.position += Vector3.right * walkSpeed; }
+                if (Input.GetKey(KeyCode.LeftArrow) && myState.canMoveLeft == true) { transform.position += Vector3.left * walkSpeed; }
+                if (Input.GetKey(KeyCode.RightArrow) && myState.canMoveRight == true) { transform.position += Vector3.right * walkSpeed; }
 
                 if (myState.canClimbUp == true)
                 {
@@ -110,9 +114,11 @@ public class Chad : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D col)
     {
         Debug.Log("OnTriggerEnter: " + col.gameObject.tag);
-        if (myState.climbing == false)
+
+        if (col.gameObject.CompareTag("Log"))
         {
-            if (col.gameObject.CompareTag("Log"))
+            myState.logsTouching++;
+            if (myState.climbing == false)
             {
                 if (myState.initialLoop)
                     myState.initialLoop = false;
@@ -147,19 +153,28 @@ public class Chad : MonoBehaviour {
 
         if(col.gameObject.CompareTag("Ladder"))
             targetLadder = col.gameObject;
+
+        if (col.gameObject.CompareTag("ScreenBoundLeft"))
+            myState.canMoveLeft = false;
+        if (col.gameObject.CompareTag("ScreenBoundRight"))
+            myState.canMoveRight = false;
+
     }
 
     void OnTriggerExit2D(Collider2D col)
     {
         Debug.Log("OnTriggerExit: " + col.gameObject.tag);
-        if (myState.climbing == false)
+
+        if (col.gameObject.CompareTag("Log"))
         {
-            if (col.gameObject.CompareTag("Log"))
+            myState.logsTouching--;
+            if (myState.climbing == false && myState.logsTouching == 0)
             {
                 myState.falling = true;
             }
         }
-        else if (myState.climbing == true)
+
+        if (myState.climbing == true)
         {
             if (col.gameObject.CompareTag("StopClimbDown"))
                 myState.canClimbDown = true;
@@ -173,5 +188,10 @@ public class Chad : MonoBehaviour {
             myState.canClimbDown = false;
             targetLadder = null;
         }
+
+        if (col.gameObject.CompareTag("ScreenBoundLeft"))
+            myState.canMoveLeft = true;
+        if (col.gameObject.CompareTag("ScreenBoundRight"))
+            myState.canMoveRight = true;
     }
 }
