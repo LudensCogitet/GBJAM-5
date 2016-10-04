@@ -28,6 +28,7 @@ public class Chad : MonoBehaviour {
         public bool pushing = false;
     }
 
+    public Animator anim;
     public pState myState;
     public float walkSpeed = 2;
     public float fallSpeed = 1;
@@ -39,6 +40,7 @@ public class Chad : MonoBehaviour {
     void Awake()
     {
         myState = new pState();
+        anim = GetComponent<Animator>();
     }
 
 	// Use this for initialization
@@ -60,6 +62,7 @@ public class Chad : MonoBehaviour {
                     myState.pushing = false;
 
                 if (Input.GetKey(KeyCode.LeftArrow) && myState.canMoveLeft == true) {
+                    anim.SetBool("WalkingLeft", true);
                     transform.position += Vector3.left * walkSpeed;
                     if(myState.pushing == true && target != null)
                     {
@@ -67,12 +70,18 @@ public class Chad : MonoBehaviour {
                     }
                 }
                 if (Input.GetKey(KeyCode.RightArrow) && myState.canMoveRight == true) {
+                    anim.SetBool("WalkingRight", true);
                     transform.position += Vector3.right * walkSpeed;
                     if (myState.pushing == true && target != null)
                     {
                         target.transform.position += Vector3.right * walkSpeed;
                     }
                 }
+
+                if (Input.GetKeyUp(KeyCode.LeftArrow))
+                    anim.SetBool("WalkingLeft", false);
+                if (Input.GetKeyUp(KeyCode.RightArrow))
+                    anim.SetBool("WalkingRight", false);
 
                 if (myState.canClimbUp == true)
                 {
