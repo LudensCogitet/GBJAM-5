@@ -6,11 +6,21 @@ public class Chad : MonoBehaviour {
     public class pState
     {
         public bool initialLoop = true;
+
         public bool falling = false;
         public bool stopFalling = false;
+
+        public bool canClimbUp = false;
+        public bool stopClimbingUp = false;
+
+        public bool canClimbDown = false;
+        public bool stopClimbingDown = false;
+
+
         public bool climbing = false;
+        
+
         public bool ridingElevator = false;
-        public bool canClimb = false;
     }
 
     public pState myState;
@@ -32,7 +42,7 @@ public class Chad : MonoBehaviour {
 	}
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (myState.falling == false)
         {
@@ -40,30 +50,50 @@ public class Chad : MonoBehaviour {
             {
                 if (Input.GetKey(KeyCode.LeftArrow)) { transform.position += Vector3.left * walkSpeed; }
                 if (Input.GetKey(KeyCode.RightArrow)) { transform.position += Vector3.right * walkSpeed; }
-                
-                if(myState.canClimb == true)
+
+                if (myState.canClimbUp == true)
                 {
                     if (Input.GetKey(KeyCode.UpArrow))
                     {
-                        if (myState.climbing == false)
-                        {
-                            myState.climbing = true;
-                            transform.position = new Vector3(targetLadder.transform.position.x, transform.position.y, transform.position.z);
-                        }
-                        else
-                            transform.position += Vector3.up * climbSpeed;
+                        myState.climbing = true;
+                        transform.position = new Vector3(targetLadder.transform.position.x, transform.position.y, transform.position.z);
                     }
+
+                }
+                if (myState.canClimbDown == true)
+                {
                     if (Input.GetKey(KeyCode.DownArrow))
                     {
-                        if (myState.climbing == false)
-                        {
-                            myState.climbing = true;
-                            transform.position = new Vector3(targetLadder.transform.position.x, transform.position.y, transform.position.z);
-                        }
-                        else
-                            transform.position += Vector3.down * climbSpeed;
+                        myState.climbing = true;
+                        transform.position = new Vector3(targetLadder.transform.position.x, transform.position.y, transform.position.z);
                     }
                 }
+            }
+            else if (myState.climbing == true)
+            {
+                if (myState.canClimbUp)
+                {
+                    if (Input.GetKey(KeyCode.UpArrow))
+                        transform.position += Vector3.up * climbSpeed;
+                }
+                /*else if(myState.stopClimbingUp == true)
+                {
+                    myState.climbing = false;
+                    myState.stopClimbingUp = false;
+                    //transform.position += Vector3.up * climbSpeed;
+                }*/
+
+                if (myState.canClimbDown)
+                {
+                    if (Input.GetKey(KeyCode.DownArrow))
+                        transform.position += Vector3.down * climbSpeed;
+                }
+                /*else if (myState.stopClimbingDown == true)
+                {
+                    myState.climbing = false;
+                    myState.stopClimbingDown = false;
+                    //transform.position += Vector3.down * climbSpeed;
+                }*/
             }
         }
         else if (myState.falling == true)
@@ -79,31 +109,69 @@ public class Chad : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log("Hi!");
-        if (col.gameObject.CompareTag("Log"))
+        Debug.Log("OnTriggerEnter: " + col.gameObject.tag);
+        if (myState.climbing == false)
         {
-            if (myState.initialLoop)
-                myState.initialLoop = false;
-            else
-                myState.stopFalling = true;
+            if (col.gameObject.CompareTag("Log"))
+            {
+                if (myState.initialLoop)
+                    myState.initialLoop = false;
+                else
+                    //myState.stopFalling = true;
+                    myState.falling = false;
+            }
         }
-        else if (col.gameObject.CompareTag("Ladder"))
+
+        if (col.gameObject.CompareTag("StopClimbUp"))
         {
-            myState.canClimb = true;
+            myState.canClimbUp = false;
+            myState.canClimbDown = true;
+            if (myState.climbing == true)
+            {
+                myState.stopClimbingUp = true;
+                myState.climbing = false;
+            }
+        }
+
+        if (col.gameObject.CompareTag("StopClimbDown"))
+        {
+            myState.canClimbUp = true;
+            myState.canClimbDown = false;
+            if (myState.climbing == true)
+            {
+                myState.stopClimbingDown = true;
+                myState.climbing = false;
+            }
+        }
+
+
+        if(col.gameObject.CompareTag("Ladder"))
             targetLadder = col.gameObject;
-        }
     }
 
-void OnTriggerExit2D(Collider2D col)
+    void OnTriggerExit2D(Collider2D col)
     {
-        Debug.Log("bye!");
-        if (col.gameObject.CompareTag("Log"))
+        Debug.Log("OnTriggerExit: " + col.gameObject.tag);
+        if (myState.climbing == false)
         {
-            myState.falling = true;
+            if (col.gameObject.CompareTag("Log"))
+            {
+                myState.falling = true;
+            }
         }
-        else if (col.gameObject.CompareTag("Ladder"))
+        else if (myState.climbing == true)
         {
-            myState.canClimb = false;
+            if (col.gameObject.CompareTag("StopClimbDown"))
+                myState.canClimbDown = true;
+            if (col.gameObject.CompareTag("StopClimbUp"))
+                myState.canClimbUp = true;
+        }
+
+        if (col.gameObject.CompareTag("Ladder"))
+        {
+            myState.canClimbUp = false;
+            myState.canClimbDown = false;
+            targetLadder = null;
         }
     }
 }
