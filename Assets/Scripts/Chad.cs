@@ -69,7 +69,8 @@ public class Chad : MonoBehaviour {
                         target.transform.position += Vector3.left * walkSpeed;
                     }
                 }
-                if (Input.GetKey(KeyCode.RightArrow) && myState.canMoveRight == true) {
+                if (Input.GetKey(KeyCode.RightArrow) && myState.canMoveRight == true)
+                {
                     anim.SetBool("WalkingRight", true);
                     transform.position += Vector3.right * walkSpeed;
                     if (myState.pushing == true && target != null)
@@ -77,11 +78,6 @@ public class Chad : MonoBehaviour {
                         target.transform.position += Vector3.right * walkSpeed;
                     }
                 }
-
-                if (Input.GetKeyUp(KeyCode.LeftArrow))
-                    anim.SetBool("WalkingLeft", false);
-                if (Input.GetKeyUp(KeyCode.RightArrow))
-                    anim.SetBool("WalkingRight", false);
 
                 if (myState.canClimbUp == true)
                 {
@@ -137,6 +133,11 @@ public class Chad : MonoBehaviour {
                 myState.stopFalling = false;
             }
         }
+
+        if (Input.GetKeyUp(KeyCode.LeftArrow))
+            anim.SetBool("WalkingLeft", false);
+        if (Input.GetKeyUp(KeyCode.RightArrow))
+            anim.SetBool("WalkingRight", false);
     }
 
     void OnTriggerEnter2D(Collider2D col)
