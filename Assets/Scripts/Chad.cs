@@ -33,6 +33,7 @@ public class Chad : MonoBehaviour {
     public float climbSpeed = 0.5f;
 
     public GameObject target = null;
+    public GameObject currentCenterLine = null;
 
 
     void Awake()
@@ -143,7 +144,11 @@ public class Chad : MonoBehaviour {
                     myState.initialLoop = false;
                 else
                 {
-                    myState.falling = false;
+                    if (myState.falling == true)
+                    {
+                        myState.falling = false;
+                        transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
+                    }
                 }
             }
         }
@@ -155,6 +160,7 @@ public class Chad : MonoBehaviour {
             if (myState.climbing == true)
             {
                 myState.climbing = false;
+                transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
             }
         }
 
@@ -165,6 +171,7 @@ public class Chad : MonoBehaviour {
             if (myState.climbing == true)
             {
                 myState.climbing = false;
+                transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
             }
         }
 
@@ -177,6 +184,17 @@ public class Chad : MonoBehaviour {
         if (col.gameObject.CompareTag("ScreenBoundRight"))
             myState.canMoveRight = false;
 
+        if (col.gameObject.CompareTag("CenterLine"))
+            currentCenterLine = col.gameObject;
+
+        if (col.gameObject.CompareTag("Elevator"))
+        {
+            if(col.gameObject.GetComponent<Elevator>().atBottom == false)
+            {
+                myState.ridingElevator = true;
+            }
+        }
+
     }
 
     void OnTriggerExit2D(Collider2D col)
@@ -185,10 +203,13 @@ public class Chad : MonoBehaviour {
 
         if (col.gameObject.CompareTag("Log"))
         {
-            myState.logsTouching--;
-            if (myState.climbing == false && myState.logsTouching == 0)
+            if (myState.ridingElevator == false)
             {
-                myState.falling = true;
+                myState.logsTouching--;
+                if (myState.climbing == false && myState.logsTouching == 0)
+                {
+                    myState.falling = true;
+                }
             }
         }
 

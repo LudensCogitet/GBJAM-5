@@ -23,6 +23,7 @@ public class Elevator : MonoBehaviour {
         if (moving)
         {
             transform.position += Vector3.down * speed;
+            thePlayer.transform.position += Vector3.down * speed;
         }
         else if (beingMoved)
         {
@@ -39,6 +40,7 @@ public class Elevator : MonoBehaviour {
             otherElevator.beingMoved = false;
             thePlayer.myState.canMoveLeft = true;
             thePlayer.myState.canMoveRight = true;
+            thePlayer.myState.ridingElevator = false;
         }
         else if (col.gameObject.CompareTag("Player"))
         {
@@ -47,6 +49,7 @@ public class Elevator : MonoBehaviour {
                 moving = true;
                 thePlayer.myState.canMoveLeft = false;
                 thePlayer.myState.canMoveRight = false;
+                thePlayer.myState.logsTouching--;
                 otherElevator.beingMoved = true;
                 otherElevator.atBottom = false;
             }
