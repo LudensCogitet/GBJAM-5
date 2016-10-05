@@ -18,7 +18,7 @@ public class LadderStopMove : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.gameObject.CompareTag("LadderStopMove"))
+        if (col.gameObject.CompareTag("StopMove"))
         {
             if (myLadder.transform.position.x > col.gameObject.transform.position.x)
                 myLadder.canMoveLeft = false;
@@ -30,7 +30,7 @@ public class LadderStopMove : MonoBehaviour {
 
     void OnTriggerExit2D(Collider2D col)
     {
-        if(col.gameObject.CompareTag("LadderStopMove"))
+        if(col.gameObject.CompareTag("StopMove"))
         {
             if (myLadder.transform.position.x > col.gameObject.transform.position.x)
                 myLadder.canMoveLeft = true;

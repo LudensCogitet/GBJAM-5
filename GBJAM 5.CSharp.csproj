@@ -69,11 +69,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Ladder.cs" />
-    <Compile Include="Assets\LadderCanMove.cs" />
-    <Compile Include="Assets\LadderStopMove.cs" />
     <Compile Include="Assets\Scripts\Chad.cs" />
     <Compile Include="Assets\Scripts\Elevator.cs" />
+    <Compile Include="Assets\Scripts\Ladder.cs" />
+    <Compile Include="Assets\Scripts\LadderCanMove.cs" />
+    <Compile Include="Assets\Scripts\LadderStopMove.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
