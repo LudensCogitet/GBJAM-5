@@ -33,6 +33,7 @@ public class Chad : MonoBehaviour {
     public float climbSpeed = 0.5f;
 
     public GameObject target = null;
+    public Ladder ladderToMove = null;
     public GameObject currentCenterLine = null;
 
 
@@ -57,16 +58,19 @@ public class Chad : MonoBehaviour {
             {
                 if (Input.GetKey(KeyCode.LeftControl))
                     myState.pushing = true;
-                else 
+                else
+                {
                     myState.pushing = false;
+                }
 
                 if (Input.GetKey(KeyCode.LeftArrow) && myState.canMoveLeft == true)
                 {
                     anim.SetBool("WalkingLeft", true);
                     transform.position += Vector3.left * walkSpeed;
-                    if (myState.pushing == true && target != null)
+                    if (myState.pushing == true && ladderToMove != null)
                     {
-                        target.transform.position += Vector3.left * walkSpeed;
+                        if (ladderToMove.canMoveLeft)
+                        ladderToMove.transform.position += Vector3.left * walkSpeed;
                     }
                 }
                 else
@@ -76,9 +80,10 @@ public class Chad : MonoBehaviour {
                 {
                     anim.SetBool("WalkingRight", true);
                     transform.position += Vector3.right * walkSpeed;
-                    if (myState.pushing == true && target != null)
+                    if (myState.pushing == true && ladderToMove != null)
                     {
-                        target.transform.position += Vector3.right * walkSpeed;
+                        if(ladderToMove.canMoveRight)
+                        ladderToMove.transform.position += Vector3.right * walkSpeed;
                     }
                 }
                 else
@@ -91,6 +96,7 @@ public class Chad : MonoBehaviour {
                         if (Input.GetKey(KeyCode.UpArrow))
                         {
                             myState.climbing = true;
+                            anim.SetBool("Climbing", true);
                             transform.position = new Vector3(target.transform.position.x, transform.position.y, transform.position.z);
                         }
 
@@ -100,6 +106,7 @@ public class Chad : MonoBehaviour {
                         if (Input.GetKey(KeyCode.DownArrow))
                         {
                             myState.climbing = true;
+                            anim.SetBool("Climbing", true);
                             transform.position = new Vector3(target.transform.position.x, transform.position.y, transform.position.z);
                         }
                     }
@@ -110,13 +117,17 @@ public class Chad : MonoBehaviour {
                 if (myState.canClimbUp)
                 {
                     if (Input.GetKey(KeyCode.UpArrow))
+                    {
                         transform.position += Vector3.up * climbSpeed;
+                    }
                 }
 
                 if (myState.canClimbDown)
                 {
                     if (Input.GetKey(KeyCode.DownArrow))
+                    {
                         transform.position += Vector3.down * climbSpeed;
+                    }
                 }
             }
         }
@@ -160,6 +171,7 @@ public class Chad : MonoBehaviour {
             if (myState.climbing == true)
             {
                 myState.climbing = false;
+                anim.SetBool("Climbing", false);
                 transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
             }
         }
@@ -171,6 +183,7 @@ public class Chad : MonoBehaviour {
             if (myState.climbing == true)
             {
                 myState.climbing = false;
+                anim.SetBool("Climbing", false);
                 transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
             }
         }
@@ -178,6 +191,9 @@ public class Chad : MonoBehaviour {
 
         if(col.gameObject.CompareTag("Ladder"))
             target = col.gameObject;
+
+        if (col.gameObject.CompareTag("LadderCanMove"))
+            ladderToMove = col.gameObject.GetComponent<LadderCanMove>().myLadder;
 
         if (col.gameObject.CompareTag("ScreenBoundLeft"))
             myState.canMoveLeft = false;
@@ -227,6 +243,9 @@ public class Chad : MonoBehaviour {
             myState.canClimbDown = false;
             target = null;
         }
+
+        if (col.gameObject.CompareTag("LadderCanMove"))
+            ladderToMove = null;
 
         if (col.gameObject.CompareTag("ScreenBoundLeft"))
             myState.canMoveLeft = true;

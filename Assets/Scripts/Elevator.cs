@@ -49,7 +49,7 @@ public class Elevator : MonoBehaviour {
                 moving = true;
                 thePlayer.myState.canMoveLeft = false;
                 thePlayer.myState.canMoveRight = false;
-                thePlayer.myState.logsTouching--;
+                //thePlayer.myState.logsTouching--;
                 otherElevator.beingMoved = true;
                 otherElevator.atBottom = false;
             }
