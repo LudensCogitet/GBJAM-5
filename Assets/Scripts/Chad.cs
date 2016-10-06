@@ -36,6 +36,9 @@ public class Chad : MonoBehaviour {
     public Ladder ladderToMove = null;
     public GameObject currentCenterLine = null;
 
+    public float scentFrequency = 5f;
+    public Scent currentScent;
+
 
     void Awake()
     {
@@ -45,8 +48,14 @@ public class Chad : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	    
+        //InvokeRepeating("Stink", scentFrequency,scentFrequency);
 	}
+
+    void Stink()
+    {
+        if (currentScent)
+            currentScent.Smell();
+    }
 
     // Update is called once per frame
     void FixedUpdate()
@@ -211,6 +220,10 @@ public class Chad : MonoBehaviour {
             }
         }
 
+        if (col.gameObject.CompareTag("Scent"))
+        {
+            col.gameObject.GetComponent<Scent>().Smell();
+        }
     }
 
     void OnTriggerExit2D(Collider2D col)
@@ -251,5 +264,11 @@ public class Chad : MonoBehaviour {
             myState.canMoveLeft = true;
         if (col.gameObject.CompareTag("ScreenBoundRight"))
             myState.canMoveRight = true;
+
+        if (col.gameObject.CompareTag("Scent"))
+        {
+            currentScent = null;
+        }
     }
+   
 }

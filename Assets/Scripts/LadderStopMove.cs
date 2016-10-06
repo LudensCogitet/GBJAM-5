@@ -20,11 +20,13 @@ public class LadderStopMove : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("StopMove"))
         {
-            if (myLadder.transform.position.x > col.gameObject.transform.position.x)
-                myLadder.canMoveLeft = false;
-            else
-                myLadder.canMoveRight = false;
-
+            if (myLadder != null)
+            {
+                if (myLadder.transform.position.x > col.gameObject.transform.position.x)
+                    myLadder.canMoveLeft = false;
+                else
+                    myLadder.canMoveRight = false;
+            }
         }
     }
 
