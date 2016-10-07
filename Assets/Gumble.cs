@@ -97,9 +97,9 @@ public class Gumble : MonoBehaviour {
         Debug.Log("*Sniff, sniff*");
         Collider2D[] odors = Physics2D.OverlapCircleAll(transform.position, noseStrength,LayerMask.GetMask("Scent"));
   
-        Scent newTarget;
+        Scent newTarget = null;
 
-        if(odors.Length > 0)
+        if (odors.Length > 0)
         {
             newTarget = odors[0].gameObject.GetComponent<Scent>();
             for (int i = 1; i < odors.Length; i++)
