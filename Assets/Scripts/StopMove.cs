@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LadderStopMove : MonoBehaviour {
+public class StopMove : MonoBehaviour {
 
-    public Ladder myLadder;
+    public Moveable myMoveable;
     BoxCollider2D myBox;
 
 	// Use this for initialization
@@ -20,12 +20,12 @@ public class LadderStopMove : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("StopMove"))
         {
-            if (myLadder != null)
+            if (myMoveable != null)
             {
-                if (myLadder.transform.position.x > col.gameObject.transform.position.x)
-                    myLadder.canMoveLeft = false;
+                if (myMoveable.transform.position.x > col.gameObject.transform.position.x)
+                    myMoveable.canMoveLeft = false;
                 else
-                    myLadder.canMoveRight = false;
+                    myMoveable.canMoveRight = false;
             }
         }
     }
@@ -34,10 +34,10 @@ public class LadderStopMove : MonoBehaviour {
     {
         if(col.gameObject.CompareTag("StopMove"))
         {
-            if (myLadder.transform.position.x > col.gameObject.transform.position.x)
-                myLadder.canMoveLeft = true;
+            if (myMoveable.transform.position.x > col.gameObject.transform.position.x)
+                myMoveable.canMoveLeft = true;
             else
-                myLadder.canMoveRight = true;
+                myMoveable.canMoveRight = true;
 
         }
     }

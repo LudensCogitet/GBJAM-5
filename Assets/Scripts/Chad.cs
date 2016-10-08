@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class Chad : MonoBehaviour {
@@ -24,6 +25,8 @@ public class Chad : MonoBehaviour {
         public bool ridingElevator = false;
 
         public bool pushing = false;
+
+        public bool done = false;
     }
 
     public Animator anim;
@@ -33,12 +36,13 @@ public class Chad : MonoBehaviour {
     public float climbSpeed = 0.5f;
 
     public GameObject target = null;
-    public Ladder ladderToMove = null;
+    public Moveable toMove = null;
     public GameObject currentCenterLine = null;
 
     public float scentFrequency = 5f;
     public Scent currentScent;
     public Gumble theGumble;
+    public Cage theCage;
 
 
     void Awake()
@@ -50,6 +54,7 @@ public class Chad : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         theGumble = FindObjectOfType<Gumble>();
+        theCage = FindObjectOfType<Cage>();
         //InvokeRepeating("Stink", scentFrequency,scentFrequency);
 	}
 
@@ -62,99 +67,118 @@ public class Chad : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
-        //Debug.Log(myState.logsTouching);
-        if (myState.falling == false)
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (myState.climbing == false)
+            Application.Quit();
+        }
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            SceneManager.LoadScene(0);
+        }
+        if (!myState.done)
+        {
+            //Debug.Log(myState.logsTouching);
+            if (myState.falling == false)
             {
-                /*if (Input.GetKeyDown(KeyCode.LeftAlt))
+                if (myState.climbing == false)
                 {
-                    //theGumble.StopMoving();
-                    //theGumble.target = transform.position;
-                    theGumble.hunting = false;
-                }*/
-                if (Input.GetKey(KeyCode.LeftControl))
-                    myState.pushing = true;
-                else
-                {
-                    myState.pushing = false;
-                }
-
-                if (Input.GetKey(KeyCode.LeftArrow) && myState.canMoveLeft == true)
-                {
-                    anim.SetBool("WalkingLeft", true);
-                    transform.position += Vector3.left * walkSpeed;
-                    if (myState.pushing == true && ladderToMove != null)
+                    /*if (Input.GetKeyDown(KeyCode.LeftAlt))
                     {
-                        if (ladderToMove.canMoveLeft)
-                        ladderToMove.transform.position += Vector3.left * walkSpeed;
+                        //theGumble.StopMoving();
+                        //theGumble.target = transform.position;
+                        theGumble.hunting = false;
+                    }*/
+                    if (Input.GetKey(KeyCode.LeftControl))
+                        myState.pushing = true;
+                    else
+                    {
+                        myState.pushing = false;
+                    }
+
+                    if (Input.GetKeyDown(KeyCode.LeftAlt) && toMove != null)
+                    {
+                        if (toMove.gameObject == theCage.gameObject)
+                        {
+                            theCage.falling = true;
+                        }
+                    }
+
+                    if (Input.GetKey(KeyCode.LeftArrow) && myState.canMoveLeft == true)
+                    {
+                        anim.SetBool("WalkingLeft", true);
+                        transform.position += Vector3.left * walkSpeed;
+                        if (myState.pushing == true && toMove != null)
+                        {
+                            if (toMove.canMoveLeft)
+                                toMove.transform.position += Vector3.left * walkSpeed;
+                        }
+                    }
+                    else
+                        anim.SetBool("WalkingLeft", false);
+
+                    if (Input.GetKey(KeyCode.RightArrow) && myState.canMoveRight == true)
+                    {
+                        anim.SetBool("WalkingRight", true);
+                        transform.position += Vector3.right * walkSpeed;
+                        if (myState.pushing == true && toMove != null)
+                        {
+                            if (toMove.canMoveRight)
+                                toMove.transform.position += Vector3.right * walkSpeed;
+                        }
+                    }
+                    else
+                        anim.SetBool("WalkingRight", false);
+
+                    if (target != null)
+                    {
+                        if (myState.canClimbUp == true)
+                        {
+                            if (Input.GetKey(KeyCode.UpArrow))
+                            {
+                                myState.climbing = true;
+                                anim.SetBool("Climbing", true);
+                                transform.position = new Vector3(target.transform.position.x, transform.position.y, transform.position.z);
+                            }
+
+                        }
+                        if (myState.canClimbDown == true)
+                        {
+                            if (Input.GetKey(KeyCode.DownArrow))
+                            {
+                                myState.climbing = true;
+                                anim.SetBool("Climbing", true);
+                                transform.position = new Vector3(target.transform.position.x, transform.position.y, transform.position.z);
+                            }
+                        }
                     }
                 }
-                else
-                    anim.SetBool("WalkingLeft", false);
-
-                if (Input.GetKey(KeyCode.RightArrow) && myState.canMoveRight == true)
+                else if (myState.climbing == true)
                 {
-                    anim.SetBool("WalkingRight", true);
-                    transform.position += Vector3.right * walkSpeed;
-                    if (myState.pushing == true && ladderToMove != null)
-                    {
-                        if(ladderToMove.canMoveRight)
-                        ladderToMove.transform.position += Vector3.right * walkSpeed;
-                    }
-                }
-                else
-                    anim.SetBool("WalkingRight", false);
-
-                if (target != null)
-                {
-                    if (myState.canClimbUp == true)
+                    if (myState.canClimbUp)
                     {
                         if (Input.GetKey(KeyCode.UpArrow))
                         {
-                            myState.climbing = true;
-                            anim.SetBool("Climbing", true);
-                            transform.position = new Vector3(target.transform.position.x, transform.position.y, transform.position.z);
+                            transform.position += Vector3.up * climbSpeed;
                         }
-
                     }
-                    if (myState.canClimbDown == true)
+
+                    if (myState.canClimbDown)
                     {
                         if (Input.GetKey(KeyCode.DownArrow))
                         {
-                            myState.climbing = true;
-                            anim.SetBool("Climbing", true);
-                            transform.position = new Vector3(target.transform.position.x, transform.position.y, transform.position.z);
+                            transform.position += Vector3.down * climbSpeed;
                         }
                     }
                 }
             }
-            else if (myState.climbing == true)
+            else if (myState.falling == true)
             {
-                if (myState.canClimbUp)
+                transform.position += Vector3.down * fallSpeed;
+                if (myState.stopFalling == true)
                 {
-                    if (Input.GetKey(KeyCode.UpArrow))
-                    {
-                        transform.position += Vector3.up * climbSpeed;
-                    }
+                    myState.falling = false;
+                    myState.stopFalling = false;
                 }
-
-                if (myState.canClimbDown)
-                {
-                    if (Input.GetKey(KeyCode.DownArrow))
-                    {
-                        transform.position += Vector3.down * climbSpeed;
-                    }
-                }
-            }
-        }
-        else if (myState.falling == true)
-        {
-            transform.position += Vector3.down * fallSpeed;
-            if(myState.stopFalling == true)
-            {
-                myState.falling = false;
-                myState.stopFalling = false;
             }
         }
     }
@@ -176,6 +200,9 @@ public class Chad : MonoBehaviour {
                     {
                         myState.falling = false;
                         transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
+                        myState.done = true;
+                        transform.Rotate(0f, 0f, 90f);
+                        transform.position += Vector3.down * 4;
                     }
                 }
             }
@@ -209,8 +236,8 @@ public class Chad : MonoBehaviour {
         if(col.gameObject.CompareTag("Ladder"))
             target = col.gameObject;
 
-        if (col.gameObject.CompareTag("LadderCanMove"))
-            ladderToMove = col.gameObject.GetComponent<LadderCanMove>().myLadder;
+        if (col.gameObject.CompareTag("CanMove"))
+            toMove = col.gameObject.GetComponent<CanMove>().myMoveable;
 
         if (col.gameObject.CompareTag("ScreenBoundLeft"))
             myState.canMoveLeft = false;
@@ -231,6 +258,12 @@ public class Chad : MonoBehaviour {
         if (col.gameObject.CompareTag("Scent"))
         {
             col.gameObject.GetComponent<Scent>().Smell();
+        }
+        if (col.gameObject.CompareTag("Gumble"))
+        {
+            myState.done = true;
+            transform.Rotate(0f, 0f, 90f);
+            transform.position += Vector3.down * 4;
         }
     }
 
@@ -265,8 +298,8 @@ public class Chad : MonoBehaviour {
             target = null;
         }
 
-        if (col.gameObject.CompareTag("LadderCanMove"))
-            ladderToMove = null;
+        if (col.gameObject.CompareTag("CanMove"))
+            toMove = null;
 
         if (col.gameObject.CompareTag("ScreenBoundLeft"))
             myState.canMoveLeft = true;

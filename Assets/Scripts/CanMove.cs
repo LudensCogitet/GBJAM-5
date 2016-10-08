@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LadderCanMove : MonoBehaviour {
+public class CanMove : MonoBehaviour {
 
-    public Ladder myLadder;
+    public Moveable myMoveable;
 
 	// Use this for initialization
 	void Start () {

@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Ladder : MonoBehaviour {
+public class Ladder : Moveable {
 
-    public bool canMoveLeft = true;
-    public bool canMoveRight = true;
+   
 
 	// Use this for initialization
 	void Start () {
