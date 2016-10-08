@@ -38,6 +38,7 @@ public class Chad : MonoBehaviour {
 
     public float scentFrequency = 5f;
     public Scent currentScent;
+    public Gumble theGumble;
 
 
     void Awake()
@@ -48,6 +49,7 @@ public class Chad : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        theGumble = FindObjectOfType<Gumble>();
         //InvokeRepeating("Stink", scentFrequency,scentFrequency);
 	}
 
@@ -60,11 +62,17 @@ public class Chad : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
-        Debug.Log(myState.logsTouching);
+        //Debug.Log(myState.logsTouching);
         if (myState.falling == false)
         {
             if (myState.climbing == false)
             {
+                if (Input.GetKeyDown(KeyCode.LeftAlt))
+                {
+                    theGumble.StopMoving();
+                    //theGumble.target = transform.position;
+                    theGumble.hunting = false;
+                }
                 if (Input.GetKey(KeyCode.LeftControl))
                     myState.pushing = true;
                 else
@@ -153,7 +161,7 @@ public class Chad : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log("OnTriggerEnter: " + col.gameObject.tag);
+        //Debug.Log("OnTriggerEnter: " + col.gameObject.tag);
 
         if (col.gameObject.CompareTag("Log"))
         {
@@ -228,7 +236,7 @@ public class Chad : MonoBehaviour {
 
     void OnTriggerExit2D(Collider2D col)
     {
-        Debug.Log("OnTriggerExit: " + col.gameObject.tag);
+        //Debug.Log("OnTriggerExit: " + col.gameObject.tag);
 
         if (col.gameObject.CompareTag("Log"))
         {

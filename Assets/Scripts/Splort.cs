@@ -9,6 +9,7 @@ public class Splort : MonoBehaviour {
 
     public float minChangeLength = 2f;
     public float maxChangeLength = 10f;
+    public float deathTime;
 
     public float speed = 0.5f;
     float accumulator = 0;
@@ -67,6 +68,11 @@ public class Splort : MonoBehaviour {
         Invoke("ChooseDir", Random.Range(minChangeLength, maxChangeLength));
     }
 
+    public void Die()
+    {
+        Destroy(gameObject);
+    }
+
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.CompareTag("StopMove"))
@@ -87,6 +93,10 @@ public class Splort : MonoBehaviour {
                 ChooseDir();
             }
         }
+        /*if (col.gameObject.CompareTag("Gumble"))
+        {
+            Invoke("Die", deathTime);
+        }*/
     }
 
     void OnTriggerExit2D(Collider2D col)

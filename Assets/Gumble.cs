@@ -3,6 +3,22 @@ using System.Collections;
 
 public class Gumble : MonoBehaviour {
 
+    public class GumbleBrain
+    {
+        public static int roaming = 0;
+        public static int hunting = 1;
+        public static int eating = 2;
+        public static int waiting = 3;
+
+        public float waitTime = 5f;
+        public float hasWaited = 0f;
+        public int state = GumbleBrain.waiting;
+    };
+
+    public GumbleBrain brain;
+    public GameObject TargetPrefab;
+    public GameObject target;
+
     public bool movingLeft;
     public bool movingRight;
 
@@ -24,7 +40,7 @@ public class Gumble : MonoBehaviour {
 
     public float noseStrength;
 
-    public Vector3 target;
+    
 
     BoxCollider2D myBox;
 
@@ -32,19 +48,33 @@ public class Gumble : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        brain = new GumbleBrain();
         myBox = GetComponent<BoxCollider2D>();
         myAnim = GetComponent<Animator>();
-        Idle();
-        InvokeRepeating("Sniff", sniffTimer, sniffTimer);
+
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
 
-        if (hunting)
+        if (brain.state == GumbleBrain.waiting)
         {
-            Hunt();
+            if (brain.hasWaited >= brain.waitTime)
+            {
+                brain.state = GumbleBrain.roaming;
+                brain.hasWaited = 0f;
+            }
+            else
+            {
+                brain.hasWaited += Time.deltaTime;
+            }
         }
+        else if(brain.state == GumbleBrain.roaming)
+        {
+            Sniff();
+        }
+
 
         if (movingLeft)
         {
@@ -66,7 +96,7 @@ public class Gumble : MonoBehaviour {
         }
 	}
 
-    void Idle()
+    public void Idle()
     {
         float rand = Random.value;
         if (movingLeft == true || movingRight == true)
@@ -91,7 +121,7 @@ public class Gumble : MonoBehaviour {
         Invoke("Idle", Random.Range(minMoveTime, maxMoveTime));
     }
 
-    void Sniff()
+    public void Sniff()
     {
 
         Debug.Log("*Sniff, sniff*");
@@ -108,19 +138,15 @@ public class Gumble : MonoBehaviour {
                 if (newTarget.age > next.age)
                     newTarget = next;
             }
-            target = new Vector3(newTarget.gameObject.transform.position.x, newTarget.gameObject.transform.position.y, newTarget.transform.position.z);
-            hunting = false;
-            Hunt();
+            target = Instantiate(TargetPrefab, newTarget.transform.position, Quaternion.identity) as GameObject;
         }
         else
         {
-            hunting = false;
-            if (!IsInvoking("Idle"))
-                Invoke("Idle", Random.Range(minMoveTime, maxMoveTime));
+
         }
     }
 
-    void Hunt()
+    /*public void Hunt()
     {
         if (hunting == true)
         {
@@ -171,9 +197,9 @@ public class Gumble : MonoBehaviour {
                 }
             }
         }
-    }
+    }*/
 
-    void MoveRight()
+    public void MoveRight()
     {
         if (canMoveRight)
         {
@@ -186,7 +212,7 @@ public class Gumble : MonoBehaviour {
             StopMoving();
     }
 
-    void MoveLeft()
+    public void MoveLeft()
     {
         if (canMoveLeft)
         {
@@ -201,7 +227,7 @@ public class Gumble : MonoBehaviour {
         }
     }
 
-    void StopMoving()
+    public void StopMoving()
     {
         if (movingRight)
         {
@@ -253,9 +279,15 @@ public class Gumble : MonoBehaviour {
 
         if (col.gameObject.CompareTag("Scent"))
         {
-            if (col.gameObject.GetComponent<Scent>().active)
-            {
-            }
+            if (hunting)
+                Sniff();
+        }
+        if (col.gameObject.CompareTag("Splort"))
+        {
+            hunting = false;
+            StopMoving();
+            myAnim.SetTrigger("Eat");
+            col.gameObject.GetComponent<Splort>().Die();
         }
     }
 
