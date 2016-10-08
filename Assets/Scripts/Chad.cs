@@ -67,12 +67,12 @@ public class Chad : MonoBehaviour {
         {
             if (myState.climbing == false)
             {
-                if (Input.GetKeyDown(KeyCode.LeftAlt))
+                /*if (Input.GetKeyDown(KeyCode.LeftAlt))
                 {
-                    theGumble.StopMoving();
+                    //theGumble.StopMoving();
                     //theGumble.target = transform.position;
                     theGumble.hunting = false;
-                }
+                }*/
                 if (Input.GetKey(KeyCode.LeftControl))
                     myState.pushing = true;
                 else
