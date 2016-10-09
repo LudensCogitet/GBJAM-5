@@ -80,6 +80,7 @@
     <Compile Include="Assets\Scripts\Splort.cs" />
     <Compile Include="Assets\Scripts\StartHandler.cs" />
     <Compile Include="Assets\Scripts\StopMove.cs" />
+    <Compile Include="Assets\Target.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

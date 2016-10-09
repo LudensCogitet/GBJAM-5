@@ -34,12 +34,14 @@ public class Scent : MonoBehaviour {
         age = 0;
         active = true;
         gameObject.layer = LayerMask.NameToLayer("Scent");
+        GetComponent<SpriteRenderer>().enabled = true;
         Invoke("Dissipate", odorStrength);
     }
 
     void Dissipate()
     {
         active = false;
+        GetComponent<SpriteRenderer>().enabled = false;
         gameObject.layer = 0;
     }
 }

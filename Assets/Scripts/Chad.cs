@@ -31,9 +31,11 @@ public class Chad : MonoBehaviour {
 
     public Animator anim;
     public pState myState;
-    public float walkSpeed = 2;
-    public float fallSpeed = 1;
+    public float walkSpeed = 2f;
+    public float fallSpeed = 1f;
     public float climbSpeed = 0.5f;
+    public float fallDistance = 0f;
+    public float maxFall = 6;
 
     public GameObject target = null;
     public Moveable toMove = null;
@@ -77,6 +79,19 @@ public class Chad : MonoBehaviour {
         }
         if (!myState.done)
         {
+            if (myState.initialLoop)
+            {
+                myState.initialLoop = false;
+            }
+            else
+            {
+
+
+                if (myState.climbing == false && myState.logsTouching == 0)
+                {
+                    myState.falling = true;
+                }
+            }
             //Debug.Log(myState.logsTouching);
             if (myState.falling == false)
             {
@@ -173,6 +188,7 @@ public class Chad : MonoBehaviour {
             }
             else if (myState.falling == true)
             {
+                fallDistance += fallSpeed;
                 transform.position += Vector3.down * fallSpeed;
                 if (myState.stopFalling == true)
                 {
@@ -190,21 +206,19 @@ public class Chad : MonoBehaviour {
         if (col.gameObject.CompareTag("Log"))
         {
             myState.logsTouching++;
-            if (myState.climbing == false)
+
+            if (myState.falling == true)
             {
-                if (myState.initialLoop)
-                    myState.initialLoop = false;
-                else
+                myState.falling = false;
+                if (fallDistance > maxFall)
                 {
-                    if (myState.falling == true)
-                    {
-                        myState.falling = false;
-                        transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
-                        myState.done = true;
-                        transform.Rotate(0f, 0f, 90f);
-                        transform.position += Vector3.down * 4;
-                    }
+                    transform.position = new Vector3(transform.position.x, currentCenterLine.transform.position.y, transform.position.z);
+                    myState.done = true;
+                    transform.Rotate(0f, 0f, 90f);
+                    transform.position += Vector3.down * 4;
                 }
+                else
+                    fallDistance = 0;
             }
         }
 
@@ -276,10 +290,6 @@ public class Chad : MonoBehaviour {
             if (myState.ridingElevator == false)
             {
                 myState.logsTouching--;
-                if (myState.climbing == false && myState.logsTouching == 0)
-                {
-                    myState.falling = true;
-                }
             }
         }
 

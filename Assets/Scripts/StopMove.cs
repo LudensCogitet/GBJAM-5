@@ -34,11 +34,13 @@ public class StopMove : MonoBehaviour {
     {
         if(col.gameObject.CompareTag("StopMove"))
         {
-            if (myMoveable.transform.position.x > col.gameObject.transform.position.x)
-                myMoveable.canMoveLeft = true;
-            else
-                myMoveable.canMoveRight = true;
-
+            if (myMoveable)
+            {
+                if (myMoveable.transform.position.x > col.gameObject.transform.position.x)
+                    myMoveable.canMoveLeft = true;
+                else
+                    myMoveable.canMoveRight = true;
+            }
         }
     }
 }

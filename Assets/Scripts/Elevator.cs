@@ -35,7 +35,9 @@ public class Elevator : MonoBehaviour {
     {
         if (col.gameObject.CompareTag("ElevatorStopDown"))
         {
-            atBottom = true;
+            if(col.gameObject.transform.parent.name == "Grass")
+                atBottom = true;
+
             moving = false;
             otherElevator.beingMoved = false;
             thePlayer.myState.canMoveLeft = true;
