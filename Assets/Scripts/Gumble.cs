@@ -53,7 +53,7 @@ public class Gumble : MonoBehaviour
 
     public float noseStrength;
 
-
+    Splort numNums = null;
 
     BoxCollider2D myBox;
 
@@ -73,12 +73,16 @@ public class Gumble : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        Debug.Log(brain.state);
         if (brain.state == GumbleBrain.done)
         {
-            myAnim.SetTrigger("Jump");
+            myAnim. Play("Jump");
         } else if (brain.state == GumbleBrain.win)
         {
-            myAnim.SetTrigger("Eat");
+            if (facingLeft)
+                myAnim.Play("GumbleEatLeft");
+            else if (facingRight)
+                myAnim.Play("GumbleEatRight");
         }
         else
         {
@@ -99,35 +103,6 @@ public class Gumble : MonoBehaviour
         }
     }
 
-    void Hunt()
-    {
-        if (!jumping)
-        {
-            if (target.gameObject.transform.position.y == transform.position.y)
-            {
-                if (target.transform.position.x > transform.position.x)
-                {
-                    MoveRight();
-                    brain.hasHunted += Time.deltaTime;
-                }
-                else if (target.gameObject.transform.position.x < transform.position.x)
-                {
-                    MoveLeft();
-                    brain.hasHunted += Time.deltaTime;
-                }
-            }
-            else
-            {
-                if (target.gameObject.transform.position.y > transform.position.y)
-                    StartCoroutine(JumpUp());
-                else if(target.gameObject.transform.position.y < transform.position.y)
-                    StartCoroutine(JumpDown());
-            }
-        }
-    }
-
-
-
     public bool Look()
     {
         if (brain.state != GumbleBrain.hunting)
@@ -136,7 +111,7 @@ public class Gumble : MonoBehaviour
             RaycastHit2D player;
             if (facingLeft)
             {
-                player = Physics2D.Raycast(transform.position, Vector2.left,Mathf.Infinity,LayerMask.GetMask("Player"));
+                player = Physics2D.Raycast(transform.position, Vector2.left, Mathf.Infinity, LayerMask.GetMask("Player"));
             }
             else
             {
@@ -145,7 +120,7 @@ public class Gumble : MonoBehaviour
 
             if (player)
             {
-                if(target)
+                if (target)
                     Destroy(target.gameObject);
 
                 target = player.collider.gameObject.GetComponent<Target>();
@@ -172,12 +147,11 @@ public class Gumble : MonoBehaviour
         }
         else
         {
-            if(target.type == Target.TargetType.random)
+            if (target.type == Target.TargetType.random)
             {
                 DetectOdors();
             }
         }
-
     }
 
     bool DetectOdors()
@@ -219,6 +193,39 @@ public class Gumble : MonoBehaviour
         }
     }
 
+    void Hunt()
+    {
+        if (!jumping)
+        {
+            if (target.gameObject.transform.position.y == transform.position.y)
+            {
+                if (target.transform.position.x > transform.position.x)
+                {
+                    MoveRight();
+                }
+                else if (target.gameObject.transform.position.x < transform.position.x)
+                {
+                    MoveLeft();
+                }
+            }
+            else
+            {
+                if (target.gameObject.transform.position.y > transform.position.y)
+                    StartCoroutine(JumpUp());
+                else if(target.gameObject.transform.position.y < transform.position.y)
+                    StartCoroutine(JumpDown());
+            }
+        }
+    }
+
+    public void killSplort()
+    {
+        if(numNums != null)
+        {
+            numNums.Die();
+        }
+    }
+
     void Wait()
     {
         if (brain.hasWaited >= brain.waitTime)
@@ -256,12 +263,12 @@ public class Gumble : MonoBehaviour
                 StartCoroutine(JumpDown());
             }
 
-            if (brain.hasRoamed >= brain.roamDistance)
+            /*if (brain.hasRoamed >= brain.roamDistance)
             {
                 brain.waiting = true;
                 brain.hasRoamed = 0;
                 StopWalking();
-            }
+            }*/
         
     }
 
@@ -269,9 +276,9 @@ public class Gumble : MonoBehaviour
     {
         facingLeft = false;
         facingRight = true;
-     
-            myAnim.SetBool("WalkLeft", false);
-            myAnim.SetBool("WalkRight", true);
+
+        myAnim.Play("GumbleWalkRight");
+            //myAnim.SetBool("WalkRight", true);
         
         transform.position += Vector3.right * speed;
     }
@@ -280,15 +287,14 @@ public class Gumble : MonoBehaviour
     {
         facingLeft = true;
         facingRight = false;
-            myAnim.SetBool("WalkRight", false);
-            myAnim.SetBool("WalkLeft", true);
-       
+        myAnim.Play("GumbleWalkLeft");
+
         transform.position += Vector3.left * speed;
     }
 
     IEnumerator JumpUp()
     {
-            myAnim.SetTrigger("Jump");
+            myAnim.Play("GumbleJump");
             jumping = true;
 
         if (brain.state == GumbleBrain.hunting)
@@ -298,12 +304,11 @@ public class Gumble : MonoBehaviour
             transform.position += Vector3.up * jumpSpeed;
             yield return null;
         }
-    
     }
 
     IEnumerator JumpDown()
     {
-        myAnim.SetTrigger("Jump");
+        myAnim.Play("GumbleJump");
         jumping = true;
         if (brain.state == GumbleBrain.hunting)
             StopHunting();
@@ -323,47 +328,73 @@ public class Gumble : MonoBehaviour
 
     public void StopWalking()
     {
-        if (myAnim.GetBool("WalkRight"))
-        {
-            myAnim.SetBool("WalkRight", false);
-        }
-        if (myAnim.GetBool("WalkLeft"))
-        {
-            myAnim.SetBool("WalkLeft", false);
-        }
+        if (facingLeft)
+            myAnim.Play("GumbleStandLeft");
+        else
+            myAnim.Play("GumbleStandRight");
     }
 
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.CompareTag("CenterLine") && col.gameObject.GetComponentInParent<Elevator>() == false)
         {
-            brain.waiting = true;
             jumping = false;
-            StopWalking();
+            if (brain.state != GumbleBrain.hunting)
+            {
+                brain.waiting = true;
+                brain.hasWaited = 0;
+
+                if (Random.value < 0.5f)
+                {
+                    facingLeft = true;
+                    facingRight = false;
+                }
+                else
+                {
+                    facingRight = true;
+                    facingLeft = false;
+                }
+            }
+            else
+            {
+                if(thePlayer.transform.position.y != transform.position.y)
+                {
+                    brain.waiting = true;
+                    brain.hasWaited = 0;
+
+                    myAnim.Play("GumbleJump");
+                }
+            }
+
             transform.position = new Vector3(transform.position.x, col.gameObject.transform.position.y, transform.position.z);
         }
 
         if (col.gameObject.CompareTag("Splort"))
         {
+            StopWalking();
             brain.waiting = true;
             brain.hasWaited = 0;
             brain.splortsEaten++;
-            myAnim.SetTrigger("Eat");
-            col.gameObject.GetComponent<Splort>().Die();
+            transform.position = new Vector3(col.gameObject.transform.position.x, transform.position.y, transform.position.z);
+            numNums = col.gameObject.GetComponent<Splort>();
+            if (facingLeft)
+                myAnim.Play("GumbleEatLeft");
+            else if (facingRight)
+                myAnim.Play("GumbleEatRight");
         }
         if (col.gameObject.CompareTag("Cage"))
         {
             Debug.Log("Cage collison:" + brain.splortsEaten + brain.splortsToEat);
 
-            if (brain.splortsEaten == brain.splortsToEat && col.gameObject.GetComponent<Cage>().falling == true)
+            if (brain.splortsEaten >= brain.splortsToEat && col.gameObject.GetComponent<Cage>().falling == true)
             {
                 transform.position = new Vector3(col.gameObject.transform.position.x,transform.position.y,transform.position.z);
                 brain.state = GumbleBrain.done;
             }
             else
             {
-                brain.waiting = true;
-                brain.hasWaited = 0;
+                //brain.waiting = true;
+                //brain.hasWaited = 0;
                 col.gameObject.GetComponent<Cage>().falling = true;
             }
         }
@@ -381,6 +412,7 @@ public class Gumble : MonoBehaviour
                 Destroy(col.gameObject);
                 target = null;
                 brain.waiting = true;
+                brain.hasWaited = 0;
                 brain.state = GumbleBrain.roaming;
                 StopWalking();
             }
